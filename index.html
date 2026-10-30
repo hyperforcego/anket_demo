@@ -66,6 +66,7 @@
   .item .label span{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:1px}
   .item .tick{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;
     display:none;align-items:center;justify-content:center}
+  .item.locked{opacity:.38;cursor:not-allowed;filter:grayscale(.6)}
   .item[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
   .item[aria-pressed="true"] .tick{display:flex}
   .item[aria-pressed="true"] .label{font-weight:600}
@@ -97,6 +98,14 @@
   .field{display:block;margin:6px 0 20px}
   .field span{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
   .field input{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);font:inherit}
+  .gender{display:flex;gap:10px;margin:2px 0 0}
+  .gender button{flex:1;padding:14px 12px;border:1.5px solid var(--line);background:var(--card);border-radius:12px;font-weight:600;font-size:15px;transition:border-color .15s,box-shadow .15s,background .15s}
+  .gender button:hover{border-color:#bfb4a5}
+  .gender button[aria-checked="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink);background:#fff}
+  .gender.invalid button{border-color:var(--accent)}
+  .field-err{min-height:20px;margin:6px 0 0!important;font-size:13.5px!important;color:var(--accent)!important;font-weight:500}
+  .codeline{margin:0 0 16px;font-size:15px}
+  .codeline b{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:20px;letter-spacing:.08em;background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:2px 10px;margin-left:6px}
   .pill{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;padding:3px 9px;border-radius:999px;background:#e9dfd0;color:#7a4a12;margin-left:8px;vertical-align:middle}
 
   .done-wrap{flex:1;overflow-y:auto;padding:22px 0 26px}
@@ -149,10 +158,14 @@
         <li>Seçimini değiştirmek için başka bir parçaya dokunman yeterli.</li>
         <li>Bitince <b>Kaydet</b>'e, ardından <b>Sonraki</b>'ne bas.</li>
       </ol>
-      <label class="field">
-        <span>Adın veya katılımcı kodun <em style="font-weight:400;color:var(--muted)">(isteğe bağlı)</em></span>
-        <input id="participant" type="text" maxlength="60" autocomplete="off" placeholder="Örn. K-014">
-      </label>
+      <div class="field" style="margin-bottom:12px">
+        <span id="genderLbl">Cinsiyetin <em style="font-weight:400;color:var(--muted)">(zorunlu)</em></span>
+        <div class="gender" id="gender" role="radiogroup" aria-labelledby="genderLbl">
+          <button type="button" role="radio" aria-checked="false" data-g="Kadın">Kadın</button>
+          <button type="button" role="radio" aria-checked="false" data-g="Erkek">Erkek</button>
+        </div>
+        <p class="field-err" id="genderErr" role="alert"></p>
+      </div>
       <div><button class="btn primary" id="btnStart" type="button">Başla</button></div>
       <p id="loadErr" style="color:var(--accent);font-size:14px;margin:12px 0 0"></p>
     </div>
@@ -199,6 +212,7 @@
       <div class="eyebrow">Tamamlandı <span class="pill" id="testPill2" hidden>Test modu</span></div>
       <h1>Teşekkürler!</h1>
       <p id="doneMsg"></p>
+      <p class="codeline">Katılımcı kodun: <b id="doneCode"></b></p>
       <div class="summary" id="summary"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px">
         <button class="btn primary" id="btnImage" type="button">Kombinleri görsel olarak kaydet (PNG)</button>
@@ -222,7 +236,7 @@
    ===================================================================== */
 // Google Apps Script "Web uygulaması" URL'si (kurulum için apps-script.gs dosyasına bak).
 // Boş bırakırsan anket "test modunda" çalışır: veri sadece ekranda/yedekte kalır.
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbzWt7N3MLMR04WvSw6b_wTVTqhJrZQEsOgJ7o13CVOEj-2bfHMF6mvAW2dqqUqAVpK81Q/exec";
+const ENDPOINT = "";
 // Apps Script'teki SECRET ile aynı olmalı (rastgele spam'i azaltır). Boş bırakabilirsin.
 const SECRET = "";
 // true: Kaydet için hem üst hem alt giyim şart
@@ -373,9 +387,17 @@ const byId = Object.fromEntries(CATALOG.map(c => [c.id, c]));
 const state = {
   idx: 0, sel: { top: null, bottom: null }, saved: false,
   sessionId: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2)),
-  participant: "", results: [], shownAt: Date.now()
+  code: "", gender: "", results: [], shownAt: Date.now()
 };
 const swapTimers = {};
+
+// Katılımcı kodu: karıştırılan karakterler (0/O, 1/I/L) olmadan 5 karakter. ~28 milyon olasılık, 70 kişide çakışma ihtimali ihmal edilebilir.
+const CODE_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+function makeCode(len = 5){
+  const a = new Uint32Array(len);
+  if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(a); else a.forEach((_, i) => { a[i] = Math.floor(Math.random() * 4294967296); });
+  return Array.from(a, v => CODE_ALPHABET[v % CODE_ALPHABET.length]).join("");
+}
 
 function show(id){
   document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
@@ -405,19 +427,27 @@ function buildCatalog(){
   });
 }
 
+// Elbise tek başına giyilir: seçilince alt giyim temizlenir ve alt giyim seçimi kilitlenir.
+const isDress = id => !!(id && byId[id] && byId[id].bottomOptional);
 function pick(it){
+  if (it.cat === "bottom" && isDress(state.sel.top)){
+    setStatus("Elbise tek başına giyilir. Alt giyim seçmek için önce elbiseyi kaldır ya da bir üst giyim seç.", "warn");
+    return;
+  }
   // aynı kategoride sadece kıyafet değişir; diğer kategori olduğu gibi kalır
   state.sel[it.cat] = (state.sel[it.cat] === it.id) ? null : it.id;
+  if (isDress(state.sel.top)) state.sel.bottom = null;
   state.saved = false;
   syncStage(); syncItems(); syncButtons();
-  const t = state.sel.top && byId[state.sel.top];
-  setStatus(t && t.bottomOptional && !state.sel.bottom ? "Bu parçayla alt giyim seçmen şart değil. İstersen doğrudan Kaydet'e basabilirsin." : "");
+  setStatus(isDress(state.sel.top) ? "Elbise tek başına giyilir, alt giyim gerekmez. Doğrudan Kaydet'e basabilirsin." : "");
 }
 
 function syncItems(){
   document.querySelectorAll(".item").forEach(b => {
     const it = byId[b.dataset.id];
     b.setAttribute("aria-pressed", state.sel[it.cat] === it.id ? "true" : "false");
+    const locked = it.cat === "bottom" && isDress(state.sel.top);
+    b.classList.toggle("locked", locked); b.setAttribute("aria-disabled", locked ? "true" : "false");
   });
 }
 
@@ -490,7 +520,7 @@ function save(){
   const t = state.sel.top && byId[state.sel.top], b = state.sel.bottom && byId[state.sel.bottom];
   const noBottom = !!(t && t.bottomOptional && !b);
   const rec = {
-    secret: SECRET, sessionId: state.sessionId, participant: state.participant,
+    secret: SECRET, sessionId: state.sessionId, code: state.code, gender: state.gender,
     order: state.idx + 1, occasionId: oc.id, occasion: oc.title,
     topId: t ? t.id : "", topName: t ? t.name : "",
     bottomId: b ? b.id : (noBottom ? "YOK" : ""), bottomName: b ? b.name : (noBottom ? "Alt giyim yok" : ""),
@@ -536,6 +566,7 @@ function miniHTML(rec){
 
 async function finish(){
   show("screen-done");
+  $("#doneCode").textContent = state.code;
   $("#summary").innerHTML = state.results.map(r => `
     <div class="sum-card">${miniHTML(r.rec)}
       <div class="cap"><b>${r.rec.occasion}</b><span>${comboLabel(r.rec)}</span></div>
@@ -591,9 +622,12 @@ async function renderSummaryCanvas(){
   g.scale(K, K); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = "high";
   g.fillStyle = "#f4efe8"; g.fillRect(0, 0, W, H);
   g.fillStyle = "#1f1c19"; g.font = "600 30px Georgia, serif"; g.textBaseline = "alphabetic";
-  g.fillText("Kombin Anketi" + (state.participant ? " — " + state.participant : ""), PAD, 46);
+  g.fillText("Kombin Anketi", PAD, 46);
   g.fillStyle = "#6b635a"; g.font = "14px system-ui, sans-serif";
   g.fillText(new Date().toLocaleDateString("tr-TR"), PAD, 68);
+  g.textAlign = "right"; g.font = "600 12px system-ui, sans-serif"; g.fillText("KATILIMCI KODU", W - PAD, 26);
+  g.fillStyle = "#1f1c19"; g.font = "700 38px ui-monospace, Menlo, Consolas, monospace"; g.fillText(state.code, W - PAD, 66);
+  g.textAlign = "left";
   const model = await loadImg(ASSETS.layers.model);
   for (let i = 0; i < recs.length; i++){
     const r = recs[i], x = PAD + i * (CW + GAP), y = HEAD;
@@ -633,7 +667,7 @@ async function uploadSummaryImage(){
     const b64 = cv.toDataURL("image/png").split(",")[1];
     await new Promise(r => setTimeout(r, 1500)); // satırların önce yazılması için kısa bekleme
     await fetch(ENDPOINT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ type: "image", secret: SECRET, sessionId: state.sessionId, participant: state.participant,
+      body: JSON.stringify({ type: "image", secret: SECRET, sessionId: state.sessionId, code: state.code, gender: state.gender,
         savedAt: new Date().toISOString(), imageBase64: b64 }) });
     state.imageSent = true;
   }catch(e){ /* sessiz: tablo verisi zaten kayıtlı, görsel indirme düğmesi yedek */ }
@@ -653,12 +687,21 @@ function init(){
       : "Görseller yüklenemedi: " + (err && err.message ? err.message : err);
     $("#btnStart").textContent = "Başlatılamadı";
   });
+  document.querySelectorAll("#gender button").forEach(b => b.addEventListener("click", () => {
+    state.gender = b.dataset.g;
+    document.querySelectorAll("#gender button").forEach(x => x.setAttribute("aria-checked", x === b ? "true" : "false"));
+    $("#gender").classList.remove("invalid"); $("#genderErr").textContent = "";
+  }));
   $("#btnStart").addEventListener("click", () => {
-    state.participant = $("#participant").value.trim();
+    if (!state.gender){
+      $("#gender").classList.add("invalid");
+      $("#genderErr").textContent = "Devam etmek için lütfen cinsiyetini seç.";
+      return;
+    }
+    state.code = makeCode();
     state.idx = 0; state.results = [];
     show("screen-build"); renderOccasion();
   });
-  $("#participant").addEventListener("keydown", e => { if (e.key === "Enter") $("#btnStart").click(); });
   $("#btnSave").addEventListener("click", save);
   $("#btnNext").addEventListener("click", next);
   $("#btnClear").addEventListener("click", () => {
