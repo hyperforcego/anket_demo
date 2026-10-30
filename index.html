@@ -222,7 +222,7 @@
    ===================================================================== */
 // Google Apps Script "Web uygulaması" URL'si (kurulum için apps-script.gs dosyasına bak).
 // Boş bırakırsan anket "test modunda" çalışır: veri sadece ekranda/yedekte kalır.
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbzWt7N3MLMR04WvSw6b_wTVTqhJrZQEsOgJ7o13CVOEj-2bfHMF6mvAW2dqqUqAVpK81Q/exec";
+const ENDPOINT = "";
 // Apps Script'teki SECRET ile aynı olmalı (rastgele spam'i azaltır). Boş bırakabilirsin.
 const SECRET = "";
 // true: Kaydet için hem üst hem alt giyim şart
@@ -242,11 +242,28 @@ const CATALOG = [
   { id: "G1", cat: "top",    name: "Uzun Kollu Gömlek",  sub: "Klasik yaka", file: "gorseller/G1.png" },
   { id: "E6", cat: "bottom", name: "Kalem Etek",         sub: "Diz altı",    file: "gorseller/E6.png" },
   { id: "P3", cat: "bottom", name: "Slim Pantolon",      sub: "Yüksek bel",  file: "gorseller/P3.png" },
-  { id: "P4", cat: "bottom", name: "Bol Paça Pantolon",  sub: "Pileli",      file: "gorseller/P4.png" }
+  { id: "P4", cat: "bottom", name: "Bol Paça Pantolon",  sub: "Pileli",      file: "gorseller/P4.png" },
+
+  // Etekler
+  { id: "E1", cat: "bottom", name: "Pileli Mini Etek",   sub: "Düğme detaylı", file: "gorseller/E1.png" },
+  { id: "E2", cat: "bottom", name: "Mini Etek",          sub: "Düz kesim",   file: "gorseller/E2.png" },
+  { id: "E3", cat: "bottom", name: "Kloş Mini Etek",     sub: "Evaze",       file: "gorseller/E3.png" },
+  { id: "E4", cat: "bottom", name: "Kısa Kalem Etek",    sub: "Diz üstü",    file: "gorseller/E4.png" },
+  { id: "E5", cat: "bottom", name: "Büzgülü Midi Etek",  sub: "Bol kesim",   file: "gorseller/E5.png" },
+
+  // Elbiseler: üst giyimle aynı yuvayı kullanır (üst giyim seçilince elbise çıkar, tersi de geçerli).
+  // bottomOptional: true  -> bu parçayla alt giyim seçmeden de kaydedilebilir.
+  { id: "D1",   cat: "top", group: "dress", bottomOptional: true, name: "Kolsuz Elbise",        sub: "Yuvarlak yaka",    file: "gorseller/D1.png" },
+  { id: "D2",   cat: "top", group: "dress", bottomOptional: true, name: "Askılı Mini Elbise",   sub: "Büstiyer detay",   file: "gorseller/D2.png" },
+  { id: "D3",   cat: "top", group: "dress", bottomOptional: true, name: "Kısa Kollu Elbise",    sub: "A kesim",          file: "gorseller/D3.png" },
+  { id: "D3V2", cat: "top", group: "dress", bottomOptional: true, name: "Dik Yaka Elbise",      sub: "Kolsuz, A kesim",  file: "gorseller/D3V2.png" },
+  { id: "D4",   cat: "top", group: "dress", bottomOptional: true, name: "V Yaka Mini Elbise",   sub: "Vücuda oturan",    file: "gorseller/D4.png" },
+  { id: "D5",   cat: "top", group: "dress", bottomOptional: true, name: "Gömlek Elbise",        sub: "Oversize, uzun",   file: "gorseller/D5.png" },
+  { id: "D6",   cat: "top", group: "dress", bottomOptional: true, name: "Kalp Yaka Midi Elbise", sub: "Askılı",          file: "gorseller/D6.png" }
 ];
 // Manken görseli (üst/alt giyimle aynı boyutta ve aynı kareden render edilmiş olmalı)
 const MODEL_FILE = "gorseller/MODEL.png";
-const CAT_LABEL = { top: "Üst Giyim", bottom: "Alt Giyim" };
+const CAT_LABEL = { top: "Üst Giyim", dress: "Elbise", bottom: "Alt Giyim" };
 
 /* ===================================================================== */
 const ASSETS = { layers: {}, thumbs: {} };
@@ -368,8 +385,9 @@ function show(id){
 function buildCatalog(){
   const root = $("#catalog");
   root.innerHTML = "";
-  ["top","bottom"].forEach(cat => {
-    const items = CATALOG.filter(c => c.cat === cat);
+  ["top","dress","bottom"].forEach(cat => {
+    const items = CATALOG.filter(c => (c.group || c.cat) === cat);
+    if (!items.length) return;
     const sec = document.createElement("section");
     sec.className = "cat-sec";
     sec.innerHTML = `<h2 class="cat-title">${CAT_LABEL[cat]}<small>${items.length} seçenek</small></h2><div class="grid"></div>`;
@@ -392,7 +410,8 @@ function pick(it){
   state.sel[it.cat] = (state.sel[it.cat] === it.id) ? null : it.id;
   state.saved = false;
   syncStage(); syncItems(); syncButtons();
-  setStatus("");
+  const t = state.sel.top && byId[state.sel.top];
+  setStatus(t && t.bottomOptional && !state.sel.bottom ? "Bu parçayla alt giyim seçmen şart değil. İstersen doğrudan Kaydet'e basabilirsin." : "");
 }
 
 function syncItems(){
@@ -452,18 +471,29 @@ function renderOccasion(){
   syncStage(); syncItems(); syncButtons(); setStatus("");
 }
 
+// Kombin kaydedilebilir mi? Elbise gibi bottomOptional parçalarda alt giyim seçmek zorunlu değil.
+function outfitProblem(){
+  const t = state.sel.top && byId[state.sel.top], b = state.sel.bottom && byId[state.sel.bottom];
+  if (!REQUIRE_BOTH) return (t || b) ? "" : "Önce bir parça seç.";
+  if (!t) return "Lütfen bir üst giyim ya da elbise seç.";
+  if (!b && !t.bottomOptional) return "Lütfen bir alt giyim seç.";
+  return "";
+}
+function comboLabel(r){
+  return [r.topName, r.bottomId === "YOK" ? "" : r.bottomName].filter(Boolean).join(" + ");
+}
+
 function save(){
-  if (REQUIRE_BOTH && !(state.sel.top && state.sel.bottom)){
-    setStatus("Lütfen bir üst ve bir alt giyim seç.", "warn"); return;
-  }
-  if (!state.sel.top && !state.sel.bottom){ setStatus("Önce bir parça seç.", "warn"); return; }
+  const problem = outfitProblem();
+  if (problem){ setStatus(problem, "warn"); return; }
   const oc = OCCASIONS[state.idx];
   const t = state.sel.top && byId[state.sel.top], b = state.sel.bottom && byId[state.sel.bottom];
+  const noBottom = !!(t && t.bottomOptional && !b);
   const rec = {
     secret: SECRET, sessionId: state.sessionId, participant: state.participant,
     order: state.idx + 1, occasionId: oc.id, occasion: oc.title,
     topId: t ? t.id : "", topName: t ? t.name : "",
-    bottomId: b ? b.id : "", bottomName: b ? b.name : "",
+    bottomId: b ? b.id : (noBottom ? "YOK" : ""), bottomName: b ? b.name : (noBottom ? "Alt giyim yok" : ""),
     note: $("#note").value.trim(),
     durationSec: Math.round((Date.now() - state.shownAt) / 1000),
     savedAt: new Date().toISOString()
@@ -508,7 +538,7 @@ async function finish(){
   show("screen-done");
   $("#summary").innerHTML = state.results.map(r => `
     <div class="sum-card">${miniHTML(r.rec)}
-      <div class="cap"><b>${r.rec.occasion}</b><span>${[r.rec.topName, r.rec.bottomName].filter(Boolean).join(" + ")}</span></div>
+      <div class="cap"><b>${r.rec.occasion}</b><span>${comboLabel(r.rec)}</span></div>
     </div>`).join("");
   // bekleyen/başarısız gönderimleri yeniden dene
   if (ENDPOINT) await retryPending();
@@ -579,7 +609,7 @@ async function renderSummaryCanvas(){
     g.fillStyle = "#1f1c19"; g.font = "600 15px system-ui, sans-serif";
     g.fillText(r.occasion, x + 12, y + MH + 32);
     g.fillStyle = "#6b635a"; g.font = "13px system-ui, sans-serif";
-    g.fillText([r.topName, r.bottomName].filter(Boolean).join(" + "), x + 12, y + MH + 54, CW - 24);
+    g.fillText(comboLabel(r), x + 12, y + MH + 54, CW - 24);
   }
   return cv;
 }
