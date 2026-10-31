@@ -9,15 +9,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#f4efe8; --card:#fbf8f3; --ink:#1f1c19; --muted:#6b635a; --line:#ddd4c8;
-    --accent:#a8452a; --accent-ink:#fff; --ok:#2f6b4a;
+    --paper:#8a8a8a; --card:#fbf8f3; --ink:#121110; --muted:#2c2a28; --line:rgba(0,0,0,.2); --card-line:#ddd4c8;
+    --accent:#6e2210; --accent-ink:#fff; --ok:#2f6b4a;
     --serif:"Fraunces", Georgia, "Times New Roman", serif;
     --sans:"Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --radius:14px;
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
-  body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  body{background:var(--paper) radial-gradient(ellipse 75% 85% at 32% 38%,#b4b4b4 0%,#9a9a9a 38%,#868686 68%,#767676 100%) fixed no-repeat;color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
   button{font:inherit;color:inherit;cursor:pointer}
   button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
@@ -34,18 +34,18 @@
   .steps{display:flex;gap:5px;flex:none}
   .steps i{display:block;width:clamp(18px,3.5vw,34px);height:4px;border-radius:2px;background:var(--line)}
   .steps i.done{background:var(--ink)}
+  .steps i{background:rgba(0,0,0,.22)}
   .steps i.now{background:var(--accent)}
   .fade-in{animation:fadeUp .35s ease both}
   @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
   /* ---------- Ana alan ---------- */
   .main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(170px,38%) 1fr;gap:20px;padding:10px 0}
-  .stage-wrap{min-height:0;border-radius:var(--radius);overflow:hidden;
-    background:#868686;
+  .stage-wrap{min-height:0;background:transparent;
     container-type:size;display:flex;align-items:center;justify-content:center;padding:0}
   .figure{position:relative;flex:none;width:min(100cqw,calc(var(--ar,.48)*102.5cqh));aspect-ratio:var(--ar,.48)}
   .figure::after{content:"";position:absolute;left:14%;right:14%;bottom:-1.2%;height:3.2%;
-    background:radial-gradient(ellipse at center,rgba(0,0,0,.28),rgba(0,0,0,0) 70%);z-index:0}
+    background:radial-gradient(ellipse at center,rgba(0,0,0,.38),rgba(0,0,0,0) 70%);z-index:0}
   .layer{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;user-select:none;
     transition:opacity .16s ease}
   .layer.off{opacity:0}
@@ -56,35 +56,33 @@
     font-family:var(--serif);font-size:19px;font-weight:600}
   .cat-title small{font-family:var(--sans);font-size:12px;color:var(--muted);font-weight:400}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,150px));gap:12px}
-  .item{position:relative;display:flex;flex-direction:column;align-self:start;text-align:left;padding:0;background:var(--card);
-    border:1.5px solid var(--line);border-radius:12px;overflow:hidden;transition:border-color .15s, transform .15s, box-shadow .15s}
-  .item:hover{border-color:#bfb4a5;transform:translateY(-1px)}
+  .item{position:relative;display:flex;flex-direction:column;align-self:start;text-align:left;padding:0;background:#979797;color:#121110;
+    border:1.5px solid #26231f;border-radius:12px;overflow:hidden;transition:border-color .15s, transform .15s, box-shadow .15s}
+  .item:hover{border-color:#6a635a;transform:translateY(-1px)}
   .item .tile{position:relative;display:block;aspect-ratio:1/.92;
-    background:#868686}
+    background:linear-gradient(160deg,#bdbdbd,#a6a6a6)}
   .item .tile img{position:absolute;inset:10px;width:calc(100% - 20px);height:calc(100% - 20px);object-fit:contain;pointer-events:none}
   .item .label{padding:8px 10px 10px;font-size:13px;font-weight:500;line-height:1.25}
-  .item .label span{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:1px}
-  .item .tick{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;
+  .item .label span{display:block;font-weight:400;color:#33312e;font-size:12px;margin-top:1px}
+  .item .tick{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:#f3efe9;color:#26231f;
     display:none;align-items:center;justify-content:center}
   .item.locked{opacity:.38;cursor:not-allowed;filter:grayscale(.6)}
-  .item[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+  .item[aria-pressed="true"]{border-color:#f3efe9;box-shadow:0 0 0 1px #f3efe9,0 4px 14px rgba(0,0,0,.35)}
   .item[aria-pressed="true"] .tick{display:flex}
   .item[aria-pressed="true"] .label{font-weight:600}
 
   /* ---------- Alt çubuk ---------- */
   .bar{border-top:1px solid var(--line);padding:9px 0 11px;display:flex;flex-wrap:nowrap;gap:10px 12px;align-items:center}
-  .note{order:1;flex:1 1 200px;min-width:0;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);font:inherit;color:inherit}
-  .note::placeholder{color:#968d82}
-  .status{order:2;flex:0 1 250px;min-height:0;font-size:13px;line-height:1.25;color:var(--muted);text-align:right}
+  .status{order:2;flex:1 1 250px;min-height:0;font-size:13px;line-height:1.25;color:var(--muted);text-align:right}
   .status.ok{color:var(--ok);font-weight:500}
   .status.warn{color:var(--accent);font-weight:500}
   .actions{order:3;display:flex;gap:8px;flex:none}
   .btn{border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:9px 16px;border-radius:999px;font-weight:600;font-size:14px;
     transition:background .15s,color .15s,opacity .15s,transform .1s}
   .btn:active{transform:scale(.98)}
-  .btn.primary{background:var(--ink);color:var(--paper)}
+  .btn.primary{background:var(--ink);color:#f1efec}
   .btn.accent{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-  .btn.ghost{border-color:var(--line);color:var(--muted);font-weight:500}
+  .btn.ghost{border-color:rgba(0,0,0,.4);color:var(--ink);font-weight:500}
   .btn:disabled{opacity:.38;cursor:not-allowed}
   .btn.pulse:not(:disabled){animation:pulse 1.6s ease-in-out infinite}
   @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(168,69,42,.35)}50%{box-shadow:0 0 0 7px rgba(168,69,42,0)}}
@@ -97,29 +95,37 @@
   .center ol li{margin:5px 0}
   .field{display:block;margin:6px 0 20px}
   .field span{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
-  .field input{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);font:inherit}
+  .field input{width:100%;padding:12px 14px;border:1.5px solid var(--card-line);border-radius:10px;background:var(--card);font:inherit}
   .gender{display:flex;gap:10px;margin:2px 0 0}
-  .gender button{flex:1;padding:14px 12px;border:1.5px solid var(--line);background:var(--card);border-radius:12px;font-weight:600;font-size:15px;transition:border-color .15s,box-shadow .15s,background .15s}
+  .gender button{flex:1;padding:14px 12px;border:1.5px solid var(--card-line);background:var(--card);border-radius:12px;font-weight:600;font-size:15px;transition:border-color .15s,box-shadow .15s,background .15s}
   .gender button:hover{border-color:#bfb4a5}
   .gender button[aria-checked="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink);background:#fff}
   .gender.invalid button{border-color:var(--accent)}
   .field-err{min-height:20px;margin:6px 0 0!important;font-size:13.5px!important;color:var(--accent)!important;font-weight:500}
   .codeline{margin:0 0 16px;font-size:15px}
-  .codeline b{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:20px;letter-spacing:.08em;background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:2px 10px;margin-left:6px}
-  .pill{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;padding:3px 9px;border-radius:999px;background:#e9dfd0;color:#7a4a12;margin-left:8px;vertical-align:middle}
+  .codeline b{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:20px;letter-spacing:.08em;background:var(--card);border:1.5px solid var(--card-line);border-radius:8px;padding:2px 10px;margin-left:6px}
+  .pill{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.55);color:#4a2a08;margin-left:8px;vertical-align:middle}
 
   .done-wrap{flex:1;overflow-y:auto;padding:22px 0 26px}
   .done-wrap h1{font-family:var(--serif);font-size:clamp(28px,5vw,40px);margin:4px 0 6px;font-weight:600}
   .done-wrap > p{color:var(--muted);margin:0 0 18px}
   .summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:0 0 22px}
-  .sum-card{background:var(--card);border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+  .sum-card{background:var(--card);border:1.5px solid var(--card-line);border-radius:12px;overflow:hidden}
   .sum-card .mini{aspect-ratio:var(--ar,.48);position:relative;height:210px;display:block}
   .sum-card .mini-bg{display:flex;justify-content:center;background:#868686;padding:8px 0}
   .mini img{position:absolute;inset:0;width:100%;height:100%}
   .sum-card .cap{padding:8px 10px 10px;font-size:13px}
   .sum-card .cap b{display:block;font-weight:600}
   .sum-card .cap span{color:var(--muted);font-size:12px}
-  .backup{background:var(--card);border:1.5px dashed var(--line);border-radius:12px;padding:14px;margin-top:6px}
+  .comment{max-width:640px;margin:0 0 20px}
+  .comment label{display:block;font-size:14px;margin-bottom:8px}
+  .comment label span{color:var(--muted)}
+  .comment textarea{width:100%;resize:vertical;padding:12px 14px;border:1.5px solid rgba(0,0,0,.35);border-radius:12px;background:#a2a2a2;font:inherit;color:var(--ink)}
+  .comment textarea::placeholder{color:#3d3b38}
+  .comment textarea:focus-visible{background:#ababab}
+  .comment-row{display:flex;align-items:center;gap:12px;margin-top:10px}
+  .comment-row .status{order:0;flex:1 1 auto;text-align:left}
+  .backup{background:var(--card);border:1.5px dashed var(--card-line);border-radius:12px;padding:14px;margin-top:6px}
   .backup textarea{width:100%;height:110px;margin-top:10px;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--line);border-radius:8px;padding:8px;background:#fff;color:var(--ink)}
 
   /* ---------- Mobil ---------- */
@@ -196,7 +202,6 @@
     </div>
 
     <div class="bar">
-      <input class="note" id="note" type="text" maxlength="240" placeholder="Neden bu kombini seçtin? (isteğe bağlı)" aria-label="Kısa not">
       <div class="actions">
         <button class="btn ghost" id="btnClear" type="button">Temizle</button>
         <button class="btn primary" id="btnSave" type="button">Kaydet</button>
@@ -214,6 +219,14 @@
       <p id="doneMsg"></p>
       <p class="codeline">Katılımcı kodun: <b id="doneCode"></b></p>
       <div class="summary" id="summary"></div>
+      <div class="comment">
+        <label for="finalComment"><b>Eklemek istediğin bir yorum var mı?</b> <span>(isteğe bağlı)</span></label>
+        <textarea id="finalComment" maxlength="1000" rows="3" placeholder="Kombin seçimlerin, katalog ya da anket hakkında düşüncelerini yazabilirsin."></textarea>
+        <div class="comment-row">
+          <button class="btn primary" id="btnComment" type="button" disabled>Yorumu gönder</button>
+          <span class="status" id="commentStatus" role="status"></span>
+        </div>
+      </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px">
         <button class="btn primary" id="btnImage" type="button">Kombinleri görsel olarak kaydet (PNG)</button>
       </div>
@@ -236,7 +249,7 @@
    ===================================================================== */
 // Google Apps Script "Web uygulaması" URL'si (kurulum için apps-script.gs dosyasına bak).
 // Boş bırakırsan anket "test modunda" çalışır: veri sadece ekranda/yedekte kalır.
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbx9mogQOvvnf6noo3Kyc6R52idEdUnE7waIDBuqbRUo-DfQAsfeLS_OiGaVQjLFXHU4/exec";
+const ENDPOINT = "";
 // Apps Script'teki SECRET ile aynı olmalı (rastgele spam'i azaltır). Boş bırakabilirsin.
 const SECRET = "";
 // true: Kaydet için hem üst hem alt giyim şart
@@ -365,6 +378,12 @@ async function loadAssets(){
   AR = w / h;
   document.documentElement.style.setProperty("--ar", AR.toFixed(4));
   ASSETS.layers.model = cropURL(m.c, x, y, w, h);
+  { // ekran için arka planı şeffaf manken (sayfa zemini üstünde doğrudan durur); özet görselleri opak sürümü kullanır
+    const mk = document.createElement("canvas"); mk.width = Math.round(w); mk.height = Math.round(h);
+    const mg = mk.getContext("2d", { willReadFrequently: true }); mg.drawImage(m.c, x, y, w, h, 0, 0, mk.width, mk.height);
+    const md = mg.getImageData(0, 0, mk.width, mk.height); keyBackground(md); mg.putImageData(md, 0, 0);
+    ASSETS.layers.modelKey = mk.toDataURL("image/png");
+  }
   for (const it of CATALOG){
     const img = await loadFile(it.file);
     // Boyut farklıysa ama en/boy oranı aynıysa manken kareye ölçeklenir; oran farklıysa uyarı verilir.
@@ -416,10 +435,9 @@ function buildCatalog(){
     const grid = sec.querySelector(".grid");
     items.forEach(it => {
       const b = document.createElement("button");
-      b.type = "button"; b.className = "item"; b.dataset.id = it.id; b.setAttribute("aria-pressed","false");
+      b.type = "button"; b.className = "item"; b.dataset.id = it.id; b.setAttribute("aria-pressed","false"); b.setAttribute("aria-label", it.name);
       b.innerHTML = `<span class="tile"><img alt="" src="${ASSETS.thumbs[it.id]}"></span>
-        <span class="label">${it.name}<span>${it.sub}</span></span>
-        <span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.4l2.6 2.6L10 3.4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+        <span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.4l2.6 2.6L10 3.4" fill="none" stroke="#26231f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
       b.addEventListener("click", () => pick(it));
       grid.appendChild(b);
     });
@@ -491,7 +509,6 @@ function renderOccasion(){
   const oc = OCCASIONS[state.idx];
   state.sel = { top: null, bottom: null };
   state.saved = false; state.shownAt = Date.now();
-  $("#note").value = "";
   $("#eyebrow").textContent = `Okazyon ${state.idx + 1} / ${OCCASIONS.length}`;
   $("#occTitle").textContent = oc.title;
   $("#occDesc").textContent = oc.desc;
@@ -524,7 +541,7 @@ function save(){
     order: state.idx + 1, occasionId: oc.id, occasion: oc.title,
     topId: t ? t.id : "", topName: t ? t.name : "",
     bottomId: b ? b.id : (noBottom ? "YOK" : ""), bottomName: b ? b.name : (noBottom ? "Alt giyim yok" : ""),
-    note: $("#note").value.trim(),
+    note: "",
     durationSec: Math.round((Date.now() - state.shownAt) / 1000),
     savedAt: new Date().toISOString()
   };
@@ -678,7 +695,7 @@ function init(){
   if (!ENDPOINT){ $("#testPill").hidden = false; $("#testPill2").hidden = false; }
   $("#btnStart").disabled = true; $("#btnStart").textContent = "Görseller yükleniyor…";
   loadAssets().then(() => {
-    $("#imgModel").src = ASSETS.layers.model;
+    $("#imgModel").src = ASSETS.layers.modelKey;
     buildCatalog();
     $("#btnStart").disabled = false; $("#btnStart").textContent = "Başla";
   }).catch(err => {
@@ -708,7 +725,19 @@ function init(){
     state.sel = { top: null, bottom: null }; state.saved = false;
     syncStage(); syncItems(); syncButtons(); setStatus("");
   });
-  $("#note").addEventListener("input", () => { if (state.saved){ state.saved = false; syncButtons(); setStatus(""); } });
+  $("#finalComment").addEventListener("input", () => { $("#btnComment").disabled = !$("#finalComment").value.trim(); $("#btnComment").textContent = "Yorumu gönder"; $("#commentStatus").textContent = ""; });
+  $("#btnComment").addEventListener("click", async () => {
+    const text = $("#finalComment").value.trim(); if (!text) return;
+    const last = state.results[state.results.length - 1]; if (!last) return;
+    last.rec.note = text; // son okazyonun satırındaki "note" sütununa yazılır (aynı satır güncellenir)
+    $("#btnComment").disabled = true;
+    if (ENDPOINT) await send(last);
+    const ok = !ENDPOINT || last.sent === "ok";
+    $("#commentStatus").className = "status " + (ok ? "ok" : "warn");
+    $("#commentStatus").textContent = !ENDPOINT ? "Test modu: yorum yalnızca yedeğe eklendi." : ok ? "Yorumun gönderildi, teşekkürler ✓" : "Gönderilemedi, tekrar dene.";
+    $("#btnComment").textContent = "Güncelle"; $("#btnComment").disabled = false;
+    paintDone();
+  });
   $("#btnRetry").addEventListener("click", async () => { $("#btnRetry").disabled = true; await retryPending(); paintDone(); $("#btnRetry").disabled = false; });
   $("#btnImage").addEventListener("click", saveSummaryImage);
   $("#btnJson").addEventListener("click", () => download("kombin-yanitlari.json", $("#backupText").value, "application/json"));
