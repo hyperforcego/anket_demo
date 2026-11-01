@@ -93,6 +93,15 @@
   .center p{color:var(--muted);margin:0 0 12px;font-size:16px}
   .center ol{margin:6px 0 22px;padding-left:20px;color:var(--muted)}
   .center ol li{margin:5px 0}
+  #screen-intro{overflow-y:auto}
+  #screen-intro .center{flex:1 0 auto;max-width:640px}
+  #screen-intro .center p,#screen-intro .center li{font-size:15px;line-height:1.5}
+  .intro-list{margin:4px 0 14px;padding-left:20px;color:var(--muted)}
+  .intro-list li{margin:7px 0}
+  .intro-h{margin:6px 0 4px!important}
+  .intro-steps{margin:0 0 16px!important}
+  .intro-steps ul{margin:4px 0 6px;padding-left:18px}
+  .center li b,.center p b{color:var(--ink)}
   .field{display:block;margin:6px 0 20px}
   .field span{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
   .field input{width:100%;padding:12px 14px;border:1.5px solid var(--card-line);border-radius:10px;background:var(--card);font:inherit}
@@ -207,14 +216,25 @@
   <!-- 1) KARŞILAMA -->
   <section class="screen active" id="screen-intro" aria-labelledby="introTitle">
     <div class="center fade-in">
-      <div class="eyebrow">Kombin Anketi <span class="pill" id="testPill" hidden>Test modu</span></div>
-      <h1 id="introTitle">Kendi kombinini oluştur.</h1>
-      <p>Sana birkaç farklı durum göstereceğiz. Her biri için modele giydirmek istediğin kıyafetleri seç.</p>
-      <ol>
-        <li>Sağdaki katalogdan bir <b>üst</b> ve bir <b>alt</b> giyim seç.</li>
-        <li>Seçimini değiştirmek için başka bir parçaya dokunman yeterli.</li>
-        <li>Bitince <b>Kaydet</b>'e, ardından <b>Sonraki</b>'ne bas.</li>
+      <div class="eyebrow">Kombin Anketi</div>
+      <h1 id="introTitle">Değerli Katılımcımız,</h1>
+      <p>Bu anket, sanatta yeterlik araştırmam kapsamında farklı sosyal durumlara yönelik giyim tercihlerini incelemek amacıyla yürütülmektedir. Katkınız için teşekkür ederiz.</p>
+      <ul class="intro-list">
+        <li><b>Kapsam ve Süre:</b> Farklı okazyonlara göre giyim tercihlerinin incelendiği bu çalışma, soru-cevap bölümleri ve 5 farklı sosyal durum için dijital görselleştirilmiş giyim tercihi aşamalarından oluşmaktadır. Anketin tamamlanması ortalama <b id="introDuration"></b> sürmektedir.</li>
+        <li><b>Ürün Havuzu:</b> Seçim yapabileceğiniz toplamda <b id="introCount"></b> adet ürün (üst, alt parça ve elbise) bulunmaktadır.</li>
+      </ul>
+      <p class="intro-h"><b>Uygulama Adımları:</b></p>
+      <ol class="intro-steps">
+        <li><b>Soru-Cevap Bölümleri:</b> Karşınıza çıkan soruları ilgili alanlara uygun şekilde yanıtlayınız.</li>
+        <li><b>Giyim Tercihi Aşaması (5 Farklı Senaryo):</b>
+          <ul>
+            <li>Her bir sosyal durum ayrı bir sayfada yer alacaktır.</li>
+            <li>Sunulan ürünlerle giyim tercihinizi oluşturunuz.</li>
+            <li>Her seçim sonrası "Kaydet" ve ardından "Sonraki" butonlarını kullanarak ilerleyiniz.</li>
+          </ul>
+        </li>
       </ol>
+      <p>Araştırmamıza gösterdiğiniz ilgi için teşekkür ederiz.<br><b>Araş. Gör. Nurşah Çağlar</b></p>
       <div style="margin-top:6px"><button class="btn primary" id="btnStart" type="button">Başla</button></div>
       <p id="loadErr" style="color:var(--accent);font-size:14px;margin:12px 0 0"></p>
     </div>
@@ -325,7 +345,7 @@
   <!-- 3) BİTİŞ -->
   <section class="screen" id="screen-done">
     <div class="done-wrap">
-      <div class="eyebrow">Tamamlandı <span class="pill" id="testPill2" hidden>Test modu</span></div>
+      <div class="eyebrow">Tamamlandı</div>
       <h1>Teşekkürler!</h1>
       <p id="doneMsg"></p>
       <p class="codeline">Katılımcı kodun: <b id="doneCode"></b></p>
@@ -435,6 +455,8 @@ const CATALOG = [
   { id: "D6",   cat: "top", group: "dress", bottomOptional: true, name: "Kalp Yaka Midi Elbise", sub: "Askılı",          file: "gorseller/D6.png" }
 ];
 // Manken görseli (üst/alt giyimle aynı boyutta ve aynı kareden render edilmiş olmalı)
+// Giriş sayfasında gösterilen ortalama tamamlanma süresi (kendi pilot ölçümüne göre güncelle)
+const APPROX_DURATION = "10-15 dakika";
 const MODEL_FILE = "gorseller/MODEL.png";
 const CAT_LABEL = { top: "Üst Giyim", dress: "Elbise", bottom: "Alt Giyim" };
 
@@ -913,7 +935,8 @@ async function uploadSummaryImage(){
 
 /* ---------- Bağlama ---------- */
 function init(){
-  if (!ENDPOINT){ $("#testPill").hidden = false; $("#testPill2").hidden = false; }
+  $("#introDuration").textContent = APPROX_DURATION;
+  $("#introCount").textContent = CATALOG.length;
   $("#btnStart").disabled = true; $("#btnStart").textContent = "Görseller yükleniyor…";
   loadAssets().then(() => {
     $("#imgModel").src = ASSETS.layers.modelKey;
