@@ -44,8 +44,6 @@
   .stage-wrap{min-height:0;background:transparent;
     container-type:size;display:flex;align-items:center;justify-content:center;padding:0}
   .figure{position:relative;flex:none;width:min(100cqw,calc(var(--ar,.48)*102.5cqh));aspect-ratio:var(--ar,.48)}
-  .figure::after{content:"";position:absolute;left:20%;right:20%;bottom:calc(var(--foot,.03) * 100% - 1.5%);height:3.2%;
-    background:radial-gradient(ellipse at center,rgba(0,0,0,.55),rgba(0,0,0,0) 72%);z-index:0}
   .layer{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;user-select:none;
     transition:opacity .16s ease}
   .layer.off{opacity:0}
@@ -549,12 +547,6 @@ async function loadAssets(){
   document.documentElement.style.setProperty("--ar", AR.toFixed(4));
   document.documentElement.style.setProperty("--foot", ((y + h - bb.y1) / h).toFixed(4)); // ayakların altından kare tabanına olan oran
   ASSETS.layers.model = cropURL(m.c, x, y, w, h);
-  { // ekran için arka planı şeffaf manken (sayfa zemini üstünde doğrudan durur); özet görselleri opak sürümü kullanır
-    const mk = document.createElement("canvas"); mk.width = Math.round(w); mk.height = Math.round(h);
-    const mg = mk.getContext("2d", { willReadFrequently: true }); mg.drawImage(m.c, x, y, w, h, 0, 0, mk.width, mk.height);
-    const md = mg.getImageData(0, 0, mk.width, mk.height); keyBackground(md); mg.putImageData(md, 0, 0);
-    ASSETS.layers.modelKey = mk.toDataURL("image/png");
-  }
   for (const it of CATALOG){
     const img = await loadFile(it.file);
     // Boyut farklıysa ama en/boy oranı aynıysa manken kareye ölçeklenir; oran farklıysa uyarı verilir.
@@ -942,7 +934,7 @@ function init(){
   $("#introCount").textContent = CATALOG.length;
   $("#btnStart").disabled = true; $("#btnStart").textContent = "Görseller yükleniyor…";
   loadAssets().then(() => {
-    $("#imgModel").src = ASSETS.layers.modelKey;
+    $("#imgModel").src = ASSETS.layers.model; // arka planı olduğu gibi (silinmeden) göster
     buildCatalog();
     $("#btnStart").disabled = false; $("#btnStart").textContent = "Başla";
   }).catch(err => {
