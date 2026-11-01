@@ -846,7 +846,7 @@ function paintDone(){
   $("#doneMsg").textContent = local
     ? "Test modundasınız; yanıtlar sunucuya gönderilmedi."
     : failed ? "Bazı yanıtların gönderimi doğrulanamadı. Aşağıdaki yedeği kullanabilirsiniz."
-             : "Tüm seçimleriniz kaydedildi. Katılımınız için teşekkürler. <p>İletişim için <b> nursahcaglar@gmail.com </b></p>";
+             : "Tüm seçimleriniz kaydedildi. Katılımınız için teşekkürler";
   $("#backup").hidden = !(failed || local);
   $("#btnRetry").hidden = !(failed && ENDPOINT);
   $("#backupWhy").textContent = local ? "ENDPOINT tanımlı olmadığı için veri yalnızca burada." : "Gönderim doğrulanamadı.";
