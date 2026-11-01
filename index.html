@@ -217,11 +217,11 @@
   <section class="screen active" id="screen-intro" aria-labelledby="introTitle">
     <div class="center fade-in">
       <div class="eyebrow">Kombin Anketi</div>
-      <h1 id="introTitle">Değerli Katılımcımız,</h1>
-      <p>Bu anket, sanatta yeterlik araştırmam kapsamında farklı sosyal durumlara yönelik giyim tercihlerini incelemek amacıyla yürütülmektedir. Katkınız için teşekkür ederiz.</p>
+      <h1 id="introTitle">Değerli Katılımcı,</h1>
+      <p>Bu anket, sanatta yeterlik araştırması kapsamında farklı sosyal durumlara yönelik giyim tercihlerini incelemek amacıyla yürütülmektedir.</p>
       <ul class="intro-list">
         <li><b>Kapsam ve Süre:</b> Farklı okazyonlara göre giyim tercihlerinin incelendiği bu çalışma, soru-cevap bölümleri ve 5 farklı sosyal durum için dijital görselleştirilmiş giyim tercihi aşamalarından oluşmaktadır. Anketin tamamlanması ortalama <b id="introDuration"></b> sürmektedir.</li>
-        <li><b>Ürün Havuzu:</b> Seçim yapabileceğiniz toplamda <b id="introCount"></b> adet ürün (üst, alt parça ve elbise) bulunmaktadır.</li>
+        <li><b>Ürün Havuzu:</b> Seçim yapabileceğiniz toplamda <b 24></b> adet ürün (üst, alt parça ve elbise) bulunmaktadır.</li>
       </ul>
       <p class="intro-h"><b>Uygulama Adımları:</b></p>
       <ol class="intro-steps">
@@ -234,7 +234,7 @@
           </ul>
         </li>
       </ol>
-      <p>Araştırmamıza gösterdiğiniz ilgi için teşekkür ederiz.<br><b>Araş. Gör. Nurşah Çağlar</b></p>
+      <p>Araştırmaya gösterdiğiniz ilgi için teşekkürler.<br><b>Araş. Gör. Nurşah Çağlar</b></p>
       <div style="margin-top:6px"><button class="btn primary" id="btnStart" type="button">Başla</button></div>
       <p id="loadErr" style="color:var(--accent);font-size:14px;margin:12px 0 0"></p>
     </div>
@@ -843,7 +843,7 @@ function paintDone(){
   $("#doneMsg").textContent = local
     ? "Test modundasın; yanıtlar sunucuya gönderilmedi."
     : failed ? "Bazı yanıtların gönderimi doğrulanamadı. Aşağıdaki yedeği kullanabilirsin."
-             : "Tüm kombinlerin kaydedildi. Katılımın için çok teşekkürler.";
+             : "Tüm kombinlerin kaydedildi. Katılımınız için çok teşekkürler.";
   $("#backup").hidden = !(failed || local);
   $("#btnRetry").hidden = !(failed && ENDPOINT);
   $("#backupWhy").textContent = local ? "ENDPOINT tanımlı olmadığı için veri yalnızca burada." : "Gönderim doğrulanamadı.";
