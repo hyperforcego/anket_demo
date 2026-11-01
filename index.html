@@ -128,9 +128,46 @@
   .backup{background:var(--card);border:1.5px dashed var(--card-line);border-radius:12px;padding:14px;margin-top:6px}
   .backup textarea{width:100%;height:110px;margin-top:10px;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--line);border-radius:8px;padding:8px;background:#fff;color:var(--ink)}
 
+  /* ---------- Anket (duygu durumu) ---------- */
+  .survey-wrap{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;width:100%;max-width:880px;margin:0 auto;padding:0 0 26px}
+  .survey-in{margin:auto 0;padding-top:26px}
+  .sv-title{font-family:var(--serif);font-weight:600;font-size:clamp(22px,3.6vw,32px);line-height:1.15;margin:6px 0 20px;letter-spacing:-.01em}
+  .likert{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);border:1.5px solid rgba(0,0,0,.45);border-radius:12px;table-layout:fixed}
+  .likert th,.likert td{border-bottom:1px solid rgba(0,0,0,.28);border-left:1px solid rgba(0,0,0,.28);padding:0}
+  .likert tr > :first-child{border-left:0}
+  .likert tbody tr:last-child > *{border-bottom:0}
+  .likert thead th{padding:10px 6px;font-size:12.5px;font-weight:600;line-height:1.25;text-align:center;vertical-align:middle;background:#efe9df}
+  .likert thead th{position:sticky;top:0;z-index:2}
+  .likert thead th:first-child{width:34%;border-top-left-radius:10px}
+  .likert thead th:last-child{border-top-right-radius:10px}
+  .likert tbody tr:last-child > :first-child{border-bottom-left-radius:10px}
+  .likert tbody tr:last-child > :last-child{border-bottom-right-radius:10px}
+  .likert .num{display:inline-block;min-width:1.7em;font-weight:600}
+  .likert tbody th{padding:14px 14px;text-align:left;font-weight:500;font-size:15px;line-height:1.3}
+  .likert tbody tr.missing th{color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+  .likert td label{position:relative;display:flex;align-items:center;justify-content:center;min-height:52px;cursor:pointer}
+  .likert td input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+  .likert .box{width:22px;height:22px;border:2px solid #4d4a46;border-radius:4px;background:#fff;display:flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s,transform .12s}
+  .likert .box svg{opacity:0;transition:opacity .12s}
+  .likert td:hover .box{border-color:var(--ink)}
+  .likert input:checked + .box{background:var(--ink);border-color:var(--ink)}
+  .likert input:checked + .box svg{opacity:1}
+  .likert input:focus-visible + .box{outline:2px solid var(--accent);outline-offset:2px}
+
+  .open-q{display:flex;flex-direction:column;gap:20px;margin:0 0 6px}
+  .open-q label{display:block;font-size:15.5px;font-weight:600;line-height:1.35;margin-bottom:8px}
+  .open-q label .num{display:inline-block;margin-right:8px}
+  .open-q textarea{width:100%;resize:vertical;min-height:84px;padding:12px 14px;border:1.5px solid rgba(0,0,0,.45);border-radius:12px;background:var(--card);font:inherit;color:var(--ink)}
+
   /* ---------- Mobil ---------- */
   @media (max-width:640px){
     .app{padding:0 10px}
+    .likert thead th{font-size:8.5px;padding:8px 1px;letter-spacing:-.01em}
+    .likert thead th:first-child{width:26%}
+    .likert tbody th{padding:10px 6px 10px 8px;font-size:12.5px}
+    .likert td label{min-height:48px}
+    .likert .num{min-width:0;margin-right:5px}
+    .likert .box{width:20px;height:20px}
     .head{padding:8px 0 7px;gap:10px}
     .desc{display:none}
     .steps i{width:14px}
@@ -177,6 +214,19 @@
     </div>
   </section>
 
+  <!-- 1b) ANKET (giriş sonrası, kombin öncesi) -->
+  <section class="screen" id="screen-survey" aria-labelledby="svTitle">
+    <div class="survey-wrap">
+      <div class="survey-in fade-in" id="svIn">
+        <div class="eyebrow" id="svEyebrow"></div>
+        <h1 class="sv-title" id="svTitle"></h1>
+        <table class="likert" id="svTable"></table>
+        <p class="field-err" id="svErr" role="alert"></p>
+        <div><button class="btn primary" id="btnSvNext" type="button">Devam</button></div>
+      </div>
+    </div>
+  </section>
+
   <!-- 2) KOMBİN OLUŞTURMA -->
   <section class="screen" id="screen-build" aria-live="polite">
     <header class="head">
@@ -211,6 +261,19 @@
     </div>
   </section>
 
+  <!-- 2b) AÇIK UÇLU SORULAR (kombinlerden sonra, bitişten önce) -->
+  <section class="screen" id="screen-open" aria-labelledby="opTitle">
+    <div class="survey-wrap">
+      <div class="survey-in fade-in">
+        <div class="eyebrow">Son adım</div>
+        <h1 class="sv-title" id="opTitle">Son olarak birkaç soru.</h1>
+        <div class="open-q" id="openQs"></div>
+        <p class="field-err" id="opErr" role="alert"></p>
+        <div><button class="btn primary" id="btnFinish" type="button">Bitir ✓</button></div>
+      </div>
+    </div>
+  </section>
+
   <!-- 3) BİTİŞ -->
   <section class="screen" id="screen-done">
     <div class="done-wrap">
@@ -219,14 +282,6 @@
       <p id="doneMsg"></p>
       <p class="codeline">Katılımcı kodun: <b id="doneCode"></b></p>
       <div class="summary" id="summary"></div>
-      <div class="comment">
-        <label for="finalComment"><b>Eklemek istediğin bir yorum var mı?</b> <span>(isteğe bağlı)</span></label>
-        <textarea id="finalComment" maxlength="1000" rows="3" placeholder="Kombin seçimlerin, katalog ya da anket hakkında düşüncelerini yazabilirsin."></textarea>
-        <div class="comment-row">
-          <button class="btn primary" id="btnComment" type="button" disabled>Yorumu gönder</button>
-          <span class="status" id="commentStatus" role="status"></span>
-        </div>
-      </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px">
         <button class="btn primary" id="btnImage" type="button">Kombinleri görsel olarak kaydet (PNG)</button>
       </div>
@@ -261,6 +316,42 @@ const OCCASIONS = [
   { id: "toplanti",     title: "Toplantı",           desc: "Önemli bir iş toplantısı seni bekliyor." },
   { id: "arkadas",      title: "Arkadaş Buluşması",  desc: "Yakın arkadaşlarınla akşam kahvesi. Rahat ama şık." },
   { id: "davet",        title: "Davet / Akşam Yemeği", desc: "Özel bir davete ya da akşam yemeğine çağrıldın." }
+];
+
+// Anket aşamaları (sırayla). when: "before" -> giriş sonrası, kombinlerden önce; "after" -> kombinlerden sonra, açık uçlu sorulardan önce.
+// Yeni bir aşama eklemek için bu diziye bir nesne daha eklemen yeterli. Yanıtlar 1-5 olarak "Anket" sekmesine yazılır;
+// sütun adı = aşama id + "_" + madde id (örn. s1_sakin).
+const SURVEY = [
+  { id: "s1", when: "before", nextLabel: "Kombinlere geç →", eyebrow: "Anket · 1. bölüm",
+    title: "Lütfen aşağıdaki ifadeleri şu anki duygu durumunuzu dikkate alarak işaretleyiniz.",
+    scale: ["Hiç katılmıyorum", "Az katılıyorum", "Orta düzeyde katılıyorum", "Katılıyorum", "Tamamen katılıyorum"],
+    items: [
+      { id: "sakin",  text: "Kendimi sakin hissediyorum." },
+      { id: "gergin", text: "Kendimi gergin hissediyorum." },
+      { id: "yorgun", text: "Kendimi yorgun hissediyorum." }
+    ] },
+  { id: "s2", when: "after", nextLabel: "Devam →", eyebrow: "Anket · 2. bölüm", numbered: true,
+    title: "Lütfen aşağıdaki ifadelere ne ölçüde katıldığınızı işaretleyiniz.",
+    scale: ["Hiç katılmıyorum", "Katılmıyorum", "Kararsızım", "Katılıyorum", "Tamamen katılıyorum"],
+    items: [
+      { id: "m1", text: "Moda trendlerini düzenli olarak takip ederim" },
+      { id: "m2", text: "Giydiğim kıyafetler aracılığıyla tarzımı ifade etmeyi severim." },
+      { id: "m3", text: "Giysilerim kişiliğimi yansıtır." },
+      { id: "m4", text: "Gördüğüm bir stil, o günkü giyim tercihlerimi etkileyebilir." },
+      { id: "m5", text: "Kamusal alanda giydiğim kıyafetlerin dikkat çekip çekmediğini düşünürüm." },
+      { id: "m6", text: "Başkalarının bakışlarını üzerimde hissettiğimde rahatsız olurum." },
+      { id: "m7", text: "Toplumun “uygun” kabul ettiği şekilde giyinmeye özen gösteririm." },
+      { id: "m8", text: "Kıyafetlerimde bedenimin belli bölgelerini gizlemeyi tercih ederim." },
+      { id: "m9", text: "Kıyafet seçimlerimde öncelikli olarak bedenimin nasıl görüneceğini düşünürüm." }
+    ] }
+];
+
+// Kombinlerden sonra gösterilen açık uçlu sorular (isteğe bağlı). Yanıtlar "Anket" sekmesine yazılır;
+// "note: true" olan yanıt ayrıca son okazyon satırının "note" sütununa da kopyalanır.
+const OPEN_QUESTIONS = [
+  { id: "s3_strateji", no: 3, text: "Görevleri yaparken nasıl bir strateji izlediniz? (1-2 cümle)", max: 500 },
+  { id: "s3_etki",     no: 4, text: "Size en çok etki eden/aklınızda kalan bir görsel veya kıyafet detayı oldu mu?", max: 1000 },
+  { id: "s3_yorum",    no: 5, text: "Eklemek istediğiniz başka bir yorum var mı?", max: 1000, note: true }
 ];
 
 // Katalog: id'ler analizde kullanılacak kod olarak kaydedilir.
@@ -413,7 +504,7 @@ const byId = Object.fromEntries(CATALOG.map(c => [c.id, c]));
 const state = {
   idx: 0, sel: { top: null, bottom: null }, saved: false,
   sessionId: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2)),
-  code: "", gender: "", results: [], shownAt: Date.now()
+  code: "", gender: "", results: [], shownAt: Date.now(), svIdx: 0, survey: {}, surveyOk: false
 };
 const swapTimers = {};
 
@@ -506,7 +597,7 @@ function syncButtons(){
   $("#btnSave").textContent = state.saved ? "Kaydedildi ✓" : "Kaydet";
   $("#btnNext").disabled = !state.saved;
   $("#btnNext").classList.toggle("pulse", state.saved);
-  $("#btnNext").textContent = last ? "Bitir ✓" : "Sonraki →";
+  $("#btnNext").textContent = "Sonraki →"; void last;
   $("#btnClear").disabled = !(state.sel.top || state.sel.bottom);
   void complete;
 }
@@ -573,10 +664,85 @@ async function send(entry){
   }catch(e){ entry.sent = "fail"; }
 }
 
+/* ---------- Anket aşamaları ---------- */
+const svList = when => SURVEY.filter(x => x.when === when);
+function startSurvey(when, onDone){
+  const list = svList(when);
+  if (!list.length){ onDone(); return; }
+  state.svList = list; state.svIdx = 0; state.svDone = onDone;
+  show("screen-survey"); renderSurvey();
+}
+function beginBuild(){ show("screen-build"); renderOccasion(); }
+function renderSurvey(){
+  const st = state.svList[state.svIdx];
+  $("#svEyebrow").textContent = st.eyebrow;
+  $("#svTitle").textContent = st.title;
+  $("#svErr").textContent = "";
+  const check = '<svg width="14" height="14" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4l2.6 2.6L10 3.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  $("#svTable").innerHTML =
+    "<thead><tr><th scope=\"col\"><span class=\"sr\" style=\"position:absolute;left:-9999px\">İfade</span></th>" +
+    st.scale.map(l => `<th scope="col">${l}</th>`).join("") + "</tr></thead><tbody>" +
+    st.items.map((it, n) => {
+      const key = st.id + "_" + it.id;
+      return `<tr data-key="${key}"><th scope="row" id="lbl_${key}">${st.numbered ? `<span class="num">${n + 1}.</span>` : ""}${it.text}</th>` +
+        st.scale.map((l, i) => `<td><label><input type="radio" name="${key}" value="${i + 1}" aria-label="${l}" aria-describedby="lbl_${key}"${state.survey[key] === i + 1 ? " checked" : ""}><span class="box">${check}</span></label></td>`).join("") + "</tr>";
+    }).join("") + "</tbody>";
+  $("#svTable").querySelectorAll("input").forEach(inp => inp.addEventListener("change", () => {
+    state.survey[inp.name] = Number(inp.value); state.surveyOk = false;
+    inp.closest("tr").classList.remove("missing"); $("#svErr").textContent = "";
+  }));
+  $("#btnSvNext").textContent = state.svIdx === state.svList.length - 1 ? (st.nextLabel || "Devam →") : "Devam";
+  const w = $("#svIn"); w.classList.remove("fade-in"); void w.offsetWidth; w.classList.add("fade-in");
+  document.querySelector(".survey-wrap").scrollTop = 0;
+}
+function surveyNext(){
+  const st = state.svList[state.svIdx];
+  const missing = st.items.filter(it => !state.survey[st.id + "_" + it.id]);
+  document.querySelectorAll("#svTable tbody tr").forEach(tr => tr.classList.toggle("missing", missing.some(it => st.id + "_" + it.id === tr.dataset.key)));
+  if (missing.length){
+    $("#svErr").textContent = "Devam etmek için lütfen tüm ifadeleri işaretle.";
+    const el = document.querySelector("#svTable tr.missing"); if (el) el.scrollIntoView({ block: "center", behavior: "smooth" });
+    return;
+  }
+  if (ENDPOINT) sendSurvey();
+  if (state.svIdx < state.svList.length - 1){ state.svIdx++; renderSurvey(); }
+  else state.svDone();
+}
+async function sendSurvey(){
+  try{
+    await fetch(ENDPOINT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ type: "survey", secret: SECRET, sessionId: state.sessionId, code: state.code, gender: state.gender,
+        savedAt: new Date().toISOString(), answers: state.survey }), keepalive: true });
+    state.surveyOk = true;
+  }catch(e){ state.surveyOk = false; }
+}
+
 function next(){
   if (!state.saved) return;
   if (state.idx < OCCASIONS.length - 1){ state.idx++; renderOccasion(); }
-  else finish();
+  else startSurvey("after", openQuestions);
+}
+
+/* ---------- Açık uçlu sorular ---------- */
+function openQuestions(){
+  $("#openQs").innerHTML = OPEN_QUESTIONS.map(q =>
+    `<div><label for="oq_${q.id}"><span class="num">${q.no}.</span>${q.text}</label><textarea id="oq_${q.id}" maxlength="${q.max}" rows="3"></textarea></div>`).join("");
+  show("screen-open");
+  document.querySelector("#screen-open .survey-wrap").scrollTop = 0;
+}
+async function finishOpen(){
+  const btn = $("#btnFinish"); btn.disabled = true;
+  OPEN_QUESTIONS.forEach(q => {
+    const v = ($("#oq_" + q.id).value || "").trim();
+    state.survey[q.id] = v;
+    if (q.note){
+      const last = state.results[state.results.length - 1];
+      if (last && last.rec.note !== v){ last.rec.note = v; if (ENDPOINT) last.sent = "pending"; }
+    }
+  });
+  state.surveyOk = false; // finish() anket yanıtlarını ve güncellenen satırı gönderir
+  await finish();
+  btn.disabled = false;
 }
 
 /* ---------- Bitiş ---------- */
@@ -596,7 +762,7 @@ async function finish(){
       <div class="cap"><b>${r.rec.occasion}</b><span>${comboLabel(r.rec)}</span></div>
     </div>`).join("");
   // bekleyen/başarısız gönderimleri yeniden dene
-  if (ENDPOINT) await retryPending();
+  if (ENDPOINT){ if (!state.surveyOk) await sendSurvey(); await retryPending(); }
   paintDone();
   uploadSummaryImage();
 }
@@ -611,7 +777,7 @@ function paintDone(){
   $("#backup").hidden = !(failed || local);
   $("#btnRetry").hidden = !(failed && ENDPOINT);
   $("#backupWhy").textContent = local ? "ENDPOINT tanımlı olmadığı için veri yalnızca burada." : "Gönderim doğrulanamadı.";
-  $("#backupText").value = JSON.stringify(state.results.map(r => r.rec).map(({secret, ...x}) => x), null, 2);
+  $("#backupText").value = JSON.stringify({ anket: state.survey, kombinler: state.results.map(r => r.rec).map(({secret, ...x}) => x) }, null, 2);
 }
 
 async function retryPending(){
@@ -723,27 +889,16 @@ function init(){
       return;
     }
     state.code = makeCode();
-    state.idx = 0; state.results = [];
-    show("screen-build"); renderOccasion();
+    state.idx = 0; state.results = []; state.svIdx = 0; state.survey = {}; state.surveyOk = false;
+    startSurvey("before", beginBuild);
   });
+  $("#btnSvNext").addEventListener("click", surveyNext);
+  $("#btnFinish").addEventListener("click", finishOpen);
   $("#btnSave").addEventListener("click", save);
   $("#btnNext").addEventListener("click", next);
   $("#btnClear").addEventListener("click", () => {
     state.sel = { top: null, bottom: null }; state.saved = false;
     syncStage(); syncItems(); syncButtons(); setStatus("");
-  });
-  $("#finalComment").addEventListener("input", () => { $("#btnComment").disabled = !$("#finalComment").value.trim(); $("#btnComment").textContent = "Yorumu gönder"; $("#commentStatus").textContent = ""; });
-  $("#btnComment").addEventListener("click", async () => {
-    const text = $("#finalComment").value.trim(); if (!text) return;
-    const last = state.results[state.results.length - 1]; if (!last) return;
-    last.rec.note = text; // son okazyonun satırındaki "note" sütununa yazılır (aynı satır güncellenir)
-    $("#btnComment").disabled = true;
-    if (ENDPOINT) await send(last);
-    const ok = !ENDPOINT || last.sent === "ok";
-    $("#commentStatus").className = "status " + (ok ? "ok" : "warn");
-    $("#commentStatus").textContent = !ENDPOINT ? "Test modu: yorum yalnızca yedeğe eklendi." : ok ? "Yorumun gönderildi, teşekkürler ✓" : "Gönderilemedi, tekrar dene.";
-    $("#btnComment").textContent = "Güncelle"; $("#btnComment").disabled = false;
-    paintDone();
   });
   $("#btnRetry").addEventListener("click", async () => { $("#btnRetry").disabled = true; await retryPending(); paintDone(); $("#btnRetry").disabled = false; });
   $("#btnImage").addEventListener("click", saveSummaryImage);
