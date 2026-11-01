@@ -842,9 +842,9 @@ function paintDone(){
   const failed = state.results.some(r => r.sent === "fail" || r.sent === "pending");
   const local = !ENDPOINT;
   $("#doneMsg").textContent = local
-    ? "Test modundasın; yanıtlar sunucuya gönderilmedi."
-    : failed ? "Bazı yanıtların gönderimi doğrulanamadı. Aşağıdaki yedeği kullanabilirsin."
-             : "Tüm kombinlerin kaydedildi. Katılımın için çok teşekkürler.";
+    ? "Test modundasınız; yanıtlar sunucuya gönderilmedi."
+    : failed ? "Bazı yanıtların gönderimi doğrulanamadı. Aşağıdaki yedeği kullanabilirsiniz."
+             : "Tüm seçimleriniz kaydedildi. Katılımınız için teşekkürler. <p> İletişim için <b nursahcaglar@gmail.com /b>";
   $("#backup").hidden = !(failed || local);
   $("#btnRetry").hidden = !(failed && ENDPOINT);
   $("#backupWhy").textContent = local ? "ENDPOINT tanımlı olmadığı için veri yalnızca burada." : "Gönderim doğrulanamadı.";
