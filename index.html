@@ -351,7 +351,7 @@
       <p class="codeline">Katılımcı kodun: <b id="doneCode"></b></p>
       <div class="summary" id="summary"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px">
-        <button class="btn primary" id="btnImage" type="button">Kombinleri görsel olarak kaydet (PNG)</button>
+        <button class="btn primary" id="btnImage" type="button">Tercihleri görsel olarak kaydet (PNG)</button>
       </div>
       <div class="backup" id="backup" hidden>
         <div style="font-size:14px"><b>Yanıtların yedeği.</b> <span id="backupWhy" style="color:var(--muted)"></span></div>
@@ -379,11 +379,11 @@ const SECRET = "";
 const REQUIRE_BOTH = true;
 
 const OCCASIONS = [
-  { id: "is-basvurusu", title: "İş Başvurusu",       desc: "Hayalindeki işin mülakatına gidiyorsun. Ne giyerdin?" },
-  { id: "first-date",   title: "First Date",         desc: "Biriyle ilk kez buluşuyorsun. Nasıl görünmek istersin?" },
-  { id: "toplanti",     title: "Toplantı",           desc: "Önemli bir iş toplantısı seni bekliyor." },
-  { id: "arkadas",      title: "Arkadaş Buluşması",  desc: "Yakın arkadaşlarınla akşam kahvesi. Rahat ama şık." },
-  { id: "davet",        title: "Davet / Akşam Yemeği", desc: "Özel bir davete ya da akşam yemeğine çağrıldın." }
+  { id: "is-gorusmesi",    title: "İş Görüşmesi",                 desc: "Bir kadının, başvurduğu pozisyon için kurumsal bir şirkette yüz yüze iş görüşmesine katılacağını düşününüz. Görüşme, şirketin ofisinde gerçekleşecektir. Bu durum için bir giyim tercihi oluşturunuz." },
+  { id: "ilk-bulusma",     title: "İlk Buluşma",                  desc: "Bir kadının, romantik olarak ilgi duyduğu bir erkekle ilk kez baş başa akşam yemeğine çıkacağını düşününüz. Buluşma bir restoranda gerçekleşecektir." },
+  { id: "gece-eglenmesi",  title: "Gece Eğlencesi",               desc: "Bir kadının, akşam arkadaşlarıyla dans etmek ve eğlenmek için bir gece kulübüne gideceğini düşününüz." },
+  { id: "arkadas",         title: "Arkadaş Buluşması",            desc: "Bir kadının, arkadaşlarıyla sohbet etmek ve bir şeyler içmek için bir mekanda buluşacağını düşününüz." },
+  { id: "sunum",           title: "Topluluk Önünde Sunum Yapma",  desc: "Bir kadının, bir grup dinleyicinin karşısına çıkarak sunum yapacağını düşününüz." }
 ];
 
 // Anket aşamaları (sırayla). when: "before" -> giriş sonrası, kombinlerden önce; "after" -> kombinlerden sonra, açık uçlu sorulardan önce.
@@ -844,7 +844,7 @@ function paintDone(){
   $("#doneMsg").textContent = local
     ? "Test modundasınız; yanıtlar sunucuya gönderilmedi."
     : failed ? "Bazı yanıtların gönderimi doğrulanamadı. Aşağıdaki yedeği kullanabilirsiniz."
-             : "Tüm seçimleriniz kaydedildi. Katılımınız için teşekkürler. <p> İletişim için <b nursahcaglar@gmail.com /b>";
+             : "Tüm seçimleriniz kaydedildi. Katılımınız için teşekkürler. <p>İletişim için <b> nursahcaglar@gmail.com </b></p>";
   $("#backup").hidden = !(failed || local);
   $("#btnRetry").hidden = !(failed && ENDPOINT);
   $("#backupWhy").textContent = local ? "ENDPOINT tanımlı olmadığı için veri yalnızca burada." : "Gönderim doğrulanamadı.";
