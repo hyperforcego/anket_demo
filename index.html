@@ -30,6 +30,7 @@
   .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
   .title{font-family:var(--serif);font-weight:600;font-size:clamp(19px,2.3vw,24px);line-height:1.1;margin:0;letter-spacing:-.01em}
   .desc{color:var(--muted);margin:2px 0 0;font-size:12.5px;line-height:1.3}
+  .desc-short{display:none}
   .stepbox{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
   .steps{display:flex;gap:5px;flex:none}
   .steps i{display:block;width:clamp(18px,3.5vw,34px);height:4px;border-radius:2px;background:var(--line)}
@@ -191,6 +192,9 @@
     .likert .box{width:20px;height:20px}
     .head{padding:8px 0 7px;gap:10px}
     .desc{display:none}
+    .desc-short{display:block;color:var(--muted);margin:3px 0 0;font-size:11.5px;line-height:1.3}
+    .desc-short b{color:var(--ink)}
+    #headText{flex:1;min-width:0}
     .steps i{width:14px}
     .main{grid-template-columns:54% 1fr;gap:8px;padding:8px 0}
     .grid{grid-template-columns:1fr;gap:8px}
@@ -216,23 +220,24 @@
     <div class="center fade-in">
       <div class="eyebrow">Kombin Anketi</div>
       <h1 id="introTitle">Değerli Katılımcımız,</h1>
-      <p>Bu anket, sanatta yeterlik araştırması kapsamında farklı sosyal durumlara yönelik giyim tercihlerini incelemek amacıyla yürütülmektedir.</p>
+      <p>Bu anket, sanatta yeterlik araştırması kapsamında, farklı sosyal durumlarda kadın giyimine yönelik tercihleri incelemek amacıyla yürütülmektedir.</p>
+      <p><b>Bu çalışmada sizden, belirtilen sosyal durumlara katılacak bir kadın için uygun olduğunu düşündüğünüz kıyafet kombinlerini oluşturmanız beklenmektedir.</b></p>
       <ul class="intro-list">
-        <li><b>Kapsam ve Süre:</b> Farklı okazyonlara göre giyim tercihlerinin incelendiği bu çalışma, soru-cevap bölümleri ve 5 farklı sosyal durum için dijital görselleştirilmiş giyim tercihi aşamalarından oluşmaktadır. Anketin tamamlanması ortalama <b id="introDuration"></b> sürmektedir.</li>
-        <li><b>Ürün Havuzu:</b> Seçim yapabileceğiniz toplamda <b id="introCount"></b> adet ürün (üst, alt parça ve elbise) bulunmaktadır.</li>
+        <li><b>Kapsam ve Süre:</b> Anket, kısa soru-cevap bölümleri ve 5 farklı sosyal durum için kıyafet seçimi aşamalarından oluşmaktadır. Tamamlanması yaklaşık <span id="introDuration"></span> sürmektedir.</li>
+        <li><b>Kıyafet Seçenekleri:</b> Kombin oluştururken üst giyim, alt giyim ve elbise kategorilerinden toplam <span id="introCount"></span> farklı ürün arasından seçim yapabilirsiniz.</li>
       </ul>
       <p class="intro-h"><b>Uygulama Adımları:</b></p>
       <ol class="intro-steps">
-        <li><b>Soru-Cevap Bölümleri:</b> Karşınıza çıkan soruları ilgili alanlara uygun şekilde yanıtlayınız.</li>
-        <li><b>Giyim Tercihi Aşaması (5 Farklı Senaryo):</b>
+        <li><b>Sorular:</b> Karşınıza çıkan soruları ilgili alanlara yanıtlayınız.</li>
+        <li><b>Kombin Oluşturma (5 Farklı Senaryo):</b>
           <ul>
-            <li>Her bir sosyal durum ayrı bir sayfada yer alacaktır.</li>
-            <li>Sunulan ürünlerle giyim tercihinizi oluşturunuz.</li>
-            <li>Her seçim sonrası "Kaydet" ve ardından "Sonraki" butonlarını kullanarak ilerleyiniz.</li>
+            <li>Her sosyal durum ayrı bir sayfada sunulacaktır.</li>
+            <li>Belirtilen duruma katılacak bir kadın için uygun bulduğunuz kıyafetleri seçerek kombin oluşturunuz.</li>
+            <li>Her kombin sonrasında önce “Kaydet”, ardından “Sonraki” butonuna basarak ilerleyiniz.</li>
           </ul>
         </li>
       </ol>
-      <p>Katkılarınız için teşekkürler!<br><b>Araş. Gör. Nurşah Çağlar</b></p>
+      <p>Katkılarınız için teşekkür ederiz!<br><b>Araş. Gör. Nurşah Çağlar</b></p>
       <div style="margin-top:6px"><button class="btn primary" id="btnStart" type="button">Başla</button></div>
       <p id="loadErr" style="color:var(--accent);font-size:14px;margin:12px 0 0"></p>
     </div>
@@ -299,6 +304,7 @@
       <div id="headText" class="fade-in">
         <h1 class="title" id="occTitle"></h1>
         <p class="desc" id="occDesc"></p>
+        <p class="desc-short" id="occShort"></p>
       </div>
       <div class="stepbox">
         <div class="eyebrow" id="eyebrow"></div>
@@ -378,11 +384,11 @@ const SECRET = "";
 const REQUIRE_BOTH = true;
 
 const OCCASIONS = [
-  { id: "is-gorusmesi",    title: "İş Görüşmesi",                 desc: "Bir kadının, başvurduğu pozisyon için kurumsal bir şirkette yüz yüze iş görüşmesine katılacağını düşününüz. Görüşme, şirketin ofisinde gerçekleşecektir. Bu durum için bir giyim tercihi oluşturunuz." },
-  { id: "ilk-bulusma",     title: "İlk Buluşma",                  desc: "Bir kadının, romantik olarak ilgi duyduğu bir erkekle ilk kez baş başa akşam yemeğine çıkacağını düşününüz. Buluşma bir restoranda gerçekleşecektir." },
-  { id: "gece-eglenmesi",  title: "Gece Eğlencesi",               desc: "Bir kadının, akşam arkadaşlarıyla dans etmek ve eğlenmek için bir gece kulübüne gideceğini düşününüz." },
-  { id: "arkadas",         title: "Arkadaş Buluşması",            desc: "Bir kadının, arkadaşlarıyla sohbet etmek ve bir şeyler içmek için bir mekanda buluşacağını düşününüz." },
-  { id: "sunum",           title: "Topluluk Önünde Sunum Yapma",  desc: "Bir kadının, bir grup dinleyicinin karşısına çıkarak sunum yapacağını düşününüz." }
+  { id: "is-gorusmesi",    title: "İş Görüşmesi",                 short: "kurumsal bir şirkette yüz yüze iş görüşmesine katılıyor.", desc: "Bir kadının, başvurduğu pozisyon için kurumsal bir şirkette yüz yüze iş görüşmesine katılacağını düşününüz. Görüşme, şirketin ofisinde gerçekleşecektir. Bu durum için bir giyim tercihi oluşturunuz." },
+  { id: "ilk-bulusma",     title: "İlk Buluşma",                  short: "sevdiği bir erkekle ilk kez baş başa akşam yemeğine çıkıyor (restoran).", desc: "Bir kadının, romantik olarak ilgi duyduğu bir erkekle ilk kez baş başa akşam yemeğine çıkacağını düşününüz. Buluşma bir restoranda gerçekleşecektir." },
+  { id: "gece-eglenmesi",  title: "Gece Eğlencesi",               short: "arkadaşlarıyla dans edip eğlenmek için gece kulübüne gidiyor.", desc: "Bir kadının, akşam arkadaşlarıyla dans etmek ve eğlenmek için bir gece kulübüne gideceğini düşününüz." },
+  { id: "arkadas",         title: "Arkadaş Buluşması",            short: "arkadaşlarıyla sohbet etmek ve bir şeyler içmek için bir mekanda buluşuyor.", desc: "Bir kadının, arkadaşlarıyla sohbet etmek ve bir şeyler içmek için bir mekanda buluşacağını düşününüz." },
+  { id: "sunum",           title: "Topluluk Önünde Sunum Yapma",  short: "bir grup dinleyicinin karşısına çıkıp sunum yapıyor.", desc: "Bir kadının, bir grup dinleyicinin karşısına çıkarak sunum yapacağını düşününüz." }
 ];
 
 // Anket aşamaları (sırayla). when: "before" -> giriş sonrası, kombinlerden önce; "after" -> kombinlerden sonra, açık uçlu sorulardan önce.
@@ -456,7 +462,7 @@ const CATALOG = [
 ];
 // Manken görseli (üst/alt giyimle aynı boyutta ve aynı kareden render edilmiş olmalı)
 // Giriş sayfasında gösterilen ortalama tamamlanma süresi (kendi pilot ölçümüne göre güncelle)
-const APPROX_DURATION = "10-15 dakika";
+const APPROX_DURATION = "10–15 dakika";
 const MODEL_FILE = "gorseller/MODEL.png";
 const CAT_LABEL = { top: "Üst Giyim", dress: "Elbise", bottom: "Alt Giyim" };
 
@@ -675,6 +681,7 @@ function renderOccasion(){
   $("#eyebrow").textContent = `Okazyon ${state.idx + 1} / ${OCCASIONS.length}`;
   $("#occTitle").textContent = oc.title;
   $("#occDesc").textContent = oc.desc;
+  $("#occShort").innerHTML = "<b>Bir kadın,</b> " + (oc.short || "");
   $("#steps").innerHTML = OCCASIONS.map((_, i) => `<i class="${i < state.idx ? "done" : i === state.idx ? "now" : ""}"></i>`).join("");
   const ht = $("#headText"); ht.classList.remove("fade-in"); void ht.offsetWidth; ht.classList.add("fade-in");
   $("#catalog").scrollTop = 0;
